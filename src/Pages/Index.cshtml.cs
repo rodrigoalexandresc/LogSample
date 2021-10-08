@@ -19,17 +19,20 @@ namespace LogSample.Pages
 
         public void OnGet(string acao = "")
         {
-            try
-            {
-                if (acao.ToUpper() == "E")
-                    throw new Exception("Não foi possível prosseguir.");
+            if (acao.ToUpper() == "E")
+                throw new Exception("Não foi possível prosseguir.");
 
-                _logger.LogInformation("Você deu um get!!!!");                
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Seu código tem um bug!!!");
-            }
+            //try
+            //{
+            //    if (acao.ToUpper() == "E")
+            //        throw new Exception("Não foi possível prosseguir.");
+
+            //    //_logger.LogInformation("Você deu um get!!!!");                
+            //}
+            //catch (Exception ex)
+            //{
+            //    //_logger.LogError(ex, "Seu código tem um bug!!!");
+            //}
         }
     }
 }

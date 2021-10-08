@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +23,16 @@ namespace LogSample
             var elasticUri = Configuration["ElasticConfiguration:Uri"];
 
             Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()               
+                .Enrich.WithProperty("ApplicationName", "LogTest")
+                .WriteTo.Console()
                 .WriteTo.Elasticsearch(new Serilog.Sinks.Elasticsearch.ElasticsearchSinkOptions(new Uri(elasticUri))
                 {
+                    AutoRegisterTemplateVersion = Serilog.Sinks.Elasticsearch.AutoRegisterTemplateVersion.ESv7,
                     AutoRegisterTemplate = true,
+                    IndexFormat = "logtest-{0:yyyy.MM}"
                 })
                 .CreateLogger();
         }
@@ -52,7 +59,11 @@ namespace LogSample
                 app.UseHsts();
             }
 
-            loggerFactory.AddSerilog();
+            //loggerFactory.AddSerilog();
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = LogEnricher.EnrichFromRequest;
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -65,6 +76,9 @@ namespace LogSample
             {
                 endpoints.MapRazorPages();
             });
+
+            
+           
         }
     }
 }
