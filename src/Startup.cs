@@ -60,10 +60,12 @@ namespace LogSample
             }
 
             //loggerFactory.AddSerilog();
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.EnrichDiagnosticContext = LogEnricher.EnrichFromRequest;
-            });
+            //app.UseSerilogRequestLogging(options =>
+            //{
+            //    options.EnrichDiagnosticContext = LogEnricher.EnrichFromRequest;
+            //});
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
